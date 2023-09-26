@@ -1,5 +1,6 @@
 param (
-	[Int32]$Days
+	[Int32]$Days,
+	[switch]$Max
 )
 
 $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
@@ -9,15 +10,20 @@ If ($Days) {
 	$OldDate = (Get-Date) - (New-TimeSpan -Day $Days)
 	$OldDate = Get-Date $OldDate -Format "MMMM-dd-yyyy"
 }
+ElseIf ($Max) {
+	Get-ChildItem C:\Results\PrinterStatistics\Folders -Directory -Hidden | ForEach-Object {$FolderCount++}
+	$OldDate = (Get-Date) - (New-TimeSpan -Day $FolderCount)
+	$OldDate = Get-Date $OldDate -Format "MMMM-dd-yyyy"
+}
 Else {
 	$OldDate = (Get-Date) - (New-TimeSpan -Day 2)
 	$OldDate = Get-Date $OldDate -Format "MMMM-dd-yyyy"
 }
 
-$Test = Get-ChildItem -Path "$OldDate" -ErrorAction:SilentlyContinue
+$Test = Get-ChildItem -Path "\\PC1380\Results\PrinterStatistics\Folders\$OldDate" -ErrorAction:SilentlyContinue
 
 If ($Test) {
-	$OldDateData = Import-CSV -Path "C:\Results\PrinterStatistics\$OldDate\Totals.csv"
+	$OldDateData = Import-CSV -Path "\\PC1380\Results\PrinterStatistics\Folders\$OldDate\Totals.csv"
 	$OldDateMapping = @{}
 	ForEach ($Entry in $OldDateData) {
 		$OldDateMapping[$Entry."Name-Type"] = $Entry."Data"
@@ -36,7 +42,7 @@ If ($Test) {
 	}
 
 
-	$YesterdayData = Import-CSV -Path "C:\Results\PrinterStatistics\$Yesterday\Totals.csv"
+	$YesterdayData = Import-CSV -Path "\\PC1380\Results\PrinterStatistics\Folders\$Yesterday\Totals.csv"
 
 	$Comparisons = ForEach ($Entry in $YesterdayData) {
 		$YesterdayCount = $Entry.Data

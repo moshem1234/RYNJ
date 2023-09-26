@@ -1,0 +1,2 @@
+﻿$Event2 = Get-WinEvent -ComputerName PC1380 -LogName "System" -MaxEvents 1 -FilterXPath "*[System[Provider[@Name='User32']]]" | Select-Object TimeCreated, Message | Format-Table -AutoSize -Wrap | Out-String
+Send-MailMessage -From "Moshe's PC <itnotifications@rynj.org>" -To '<mmoskowitz@rynj.org>' -Subject "Moshe's PC Was Restarted Unexpectedly" -Credential $Credential -UseSSL -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "$Event2" -WarningAction:SilentlyContinue

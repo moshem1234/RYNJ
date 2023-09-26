@@ -1,9 +1,9 @@
-Set-Location C:\Results\PrinterStatistics
+Set-Location C:\Results\PrinterStatistics\Folders
 $Date = Get-Date -Format "MMMM-dd-yyyy"
 $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
 $Yesterday = Get-Date $Yesterday -Format "MMMM-dd-yyyy"
-New-Item -Name $Date -ItemType Directory | Out-Null
-Set-Location C:\Results\PrinterStatistics\$Date
+New-Item -Name $Date -ItemType Directory -ErrorAction:Inquire| Out-Null
+Set-Location C:\Results\PrinterStatistics\Folders\$Date
 
 $CSVData = Import-CSV -Path \\PC1380\Results\Printers.csv
 ForEach ($Entry in $CSVData) {
@@ -15,8 +15,10 @@ ForEach ($Entry in $CSVData) {
 	$NewIP = $IP.Trim()
     If (Test-Connection $Entry.IP -Quiet -Count 1 -ErrorAction:SilentlyContinue){
 		# Write-Output $Name
+		$ProgressPreference = 'SilentlyContinue' 
 		Invoke-WebRequest -OutFile $Name -Uri http://$NewIP/cgi-bin/dynamic/printer/config/reports/devicestatistics.html
 		Invoke-WebRequest -OutFile $Name2 -Uri http://$NewIP/cgi-bin/dynamic/printer/config/reports/deviceinfo.html
+		$ProgressPreference = 'Continue'
 	}
 	Else {
 		# New-Item -Name $Name3 -ItemType File
@@ -31,12 +33,14 @@ $Files = $Files.Name
 
 Write-Output "Name-Type,Data" | Out-File -FilePath "Totals.csv"
 
-Set-Location C:\Results\PrinterStatistics
+Set-Location C:\Results\PrinterStatistics\Folders
 attrib +h $Date
+
+Set-Location C:\Results\PrinterStatistics\Folders\$Date
 
 ForEach ($File in $Files) {
 	If ($File -Like "*Info.html") {
-		$Content = Get-Content $Date/$File
+		$Content = Get-Content $File
 
 		ForEach ($Line in $Content) {
 			If ($Line -Like "*Page&nbsp;Count*") {
@@ -48,10 +52,10 @@ ForEach ($File in $Files) {
 
 		$PrinterName = $File -replace "-Info.html|"
 
-		Write-Output "$PrinterName-PageCount,$PageCount" | Out-File -FilePath "$Date\Totals.csv" -Append
+		Write-Output "$PrinterName-PageCount,$PageCount" | Out-File -FilePath "Totals.csv" -Append
 	}
 	ElseIf ($File -Like "*Stat.html") {
-		$Content = Get-Content $Date/$File
+		$Content = Get-Content $File
 
 		ForEach ($Line in $Content) {
 			If ($Line -Like '<TR><td><p align="left" style="margin-left: 40;">Total</p></td><td><p>*&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;* </p></td>') {
@@ -68,65 +72,83 @@ ForEach ($File in $Files) {
 
 		$PrinterName = $File -replace "-Stat.html|"
 
-		Write-Output "$PrinterName-JobCount,$JobCount" | Out-File -FilePath "$Date\Totals.csv" -Append
+		Write-Output "$PrinterName-JobCount,$JobCount" | Out-File -FilePath "Totals.csv" -Append
 	}
 }
 
-$YesterdayData = Import-CSV -Path "C:\Results\PrinterStatistics\$Yesterday\Totals.csv"
-$YesterdayMapping = @{}
-ForEach ($Entry in $YesterdayData) {
-    $YesterdayMapping[$Entry."Name-Type"] = $Entry."Data"
-}
+Set-Location C:\Results\PrinterStatistics
 
-Function Get-Count {
-    Param (
-        [string]$Data
-    )
-    If ($YesterdayMapping.ContainsKey($Data)) {
-        Return $YesterdayMapping[$Data]
-    }
-	Else {
-        Return "Data not found."
-    }
-}
+Remove-Item -Path "All*.txt" -ErrorAction:SilentlyContinue
 
+Get-ChildItem C:\Results\PrinterStatistics\Folders -Directory -Hidden | ForEach-Object {$FolderCount++}
 
-$TodayData = Import-CSV -Path "C:\Results\PrinterStatistics\$Date\Totals.csv"
+Function Comparison {
+	param(
+		[switch]$Daily,
+		[switch]$All
+	)
 
-$Comparisons = ForEach ($Entry in $TodayData) {
-	$TodayCount = $Entry.Data
-	$YesterdayCount = Get-Count -Data $Entry."Name-Type"
-	$NewCount = $TodayCount - $YesterdayCount
-	$NT = $Entry."Name-Type" | Out-String
-	$NT = $NT.Trim()
-	Write-Output "$NT : $NewCount"
-}
+	If ($Daily){
+		$OldDate = (Get-Date) - (New-TimeSpan -Day 1)
+		$OldDate = Get-Date $OldDate -Format "MMMM-dd-yyyy"
+	}
+	If ($All){
+		$FolderCount2 = $FolderCount - 1
+		$OldDate = (Get-Date) - (New-TimeSpan -Day $FolderCount2)
+		$OldDate = Get-Date $OldDate -Format "MMMM-dd-yyyy"
+	}
 
-Write-Output ============================================== | Out-File -FilePath "$Date.txt"
-Write-Output "Page Counts" | Out-File -FilePath "$Date.txt" -Append
-Write-Output ============================================== | Out-File -FilePath "$Date.txt" -Append
+	$OldDateData = Import-CSV -Path "\\PC1380\Results\PrinterStatistics\Folders\$OldDate\Totals.csv"
+	$OldDateMapping = @{}
+	ForEach ($Entry in $OldDateData) {
+		$OldDateMapping[$Entry."Name-Type"] = $Entry."Data"
+	}
 
-ForEach ($Thing in $Comparisons){
-	If ($Thing -Like "*-JobCount*"){
-		$Replacement = $Thing -replace "-JobCount|"
-		Write-Output $Replacement | Out-File -FilePath "$Date.txt" -Append
+	Function Get-Count {
+		Param (
+			[string]$Data
+		)
+		If ($OldDateMapping.ContainsKey($Data)) {
+			Return $OldDateMapping[$Data]
+		}
+		Else {
+			Return "Data not found."
+		}
+	}
+
+	$TodayData = Import-CSV -Path "C:\Results\PrinterStatistics\Folders\$Date\Totals.csv"
+
+	$Comparisons = ForEach ($Entry in $TodayData) {
+		$TodayCount = $Entry.Data
+		$OldDateCount = Get-Count -Data $Entry."Name-Type"
+		$NewCount = $TodayCount - $OldDateCount
+		$NT = $Entry."Name-Type" | Out-String
+		$NT = $NT.Trim()
+		Write-Output "$NT : $NewCount"
+	}
+
+	Write-Output ==============================================
+	Write-Output "Job Counts"
+	Write-Output ==============================================
+
+	ForEach ($Thing in $Comparisons){
+		If ($Thing -Like "*-JobCount*"){
+			$Replacement = $Thing -replace "-JobCount|"
+			Write-Output $Replacement
+		}
+	}
+
+	Write-Output ==============================================
+	Write-Output "Page Counts"
+	Write-Output ==============================================
+
+	ForEach ($Thing in $Comparisons){
+		If ($Thing -Like "*-PageCount*"){
+			$Replacement = $Thing -replace "-PageCount|"
+			Write-Output $Replacement
+		}
 	}
 }
 
-Write-Output ============================================== | Out-File -FilePath "$Date.txt" -Append
-Write-Output "Job Counts" | Out-File -FilePath "$Date.txt" -Append
-Write-Output ============================================== | Out-File -FilePath "$Date.txt" -Append
-
-ForEach ($Thing in $Comparisons){
-	If ($Thing -Like "*-PageCount*"){
-		$Replacement = $Thing -replace "-PageCount|"
-		Write-Output $Replacement | Out-File -FilePath "$Date.txt" -Append
-	}
-}
-
-Write-Output "" | Out-File -FilePath "All.txt" -Append
-Write-Output ---------------------------------------------- | Out-File -FilePath "All.txt" -Append
-Write-Output "" | Out-File -FilePath "All.txt" -Append
-Write-Output $Date | Out-File -FilePath "All.txt" -Append
-Get-Content -Path "$Date.txt" | Out-File -FilePath "All.txt" -Append
-
+Comparison -Daily | Out-File -FilePath "Folders\$Date\DailyValue.txt"
+Comparison -All | Out-File -FilePath "All-($FolderCount Days).txt"

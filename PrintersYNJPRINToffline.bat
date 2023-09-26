@@ -1,0 +1,1 @@
+powershell.exe -File \\PC1380\Scripts\PrintersYNJPRINToffline.ps1

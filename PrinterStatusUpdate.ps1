@@ -1,0 +1,2 @@
+$Content = Get-Printer | Select-Object Name, PrinterStatus | Where-Object -FilterScript {($_.PrinterStatus -NotContains 'Normal') -and ($_.Name -NotLike '*YNJPRINT*')} | Out-String
+Set-Content \\PC1380\Results\PrinterStatus.txt -Value "$Content"
