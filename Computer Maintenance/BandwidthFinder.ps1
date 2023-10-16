@@ -1,10 +1,29 @@
-$PCs = Get-Content -Path '\\PC1380\Results\AllPCs.txt'
-ForEach ($Server in $PCs) {
+$CSVData = Import-CSV -Path \\PC1380\Results\Locations.csv
+$PCRoomMapping = @{}
+ForEach ($Entry in $CSVData) {
+    $PCRoomMapping[$Entry."Name"] = $Entry."Room"
+}
+
+Function Get-RoomNumber {
+    param (
+        [string]$PCName
+    )
+    if ($PCRoomMapping.ContainsKey($PCName)) {
+        return $PCRoomMapping[$PCName]
+    } else {
+        return "PC not found."
+    }
+}
+
+$PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
+$List = ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Finding Speeds" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
-		Invoke-Command -ComputerName $Server -ScriptBlock {wmic nic Where netEnabled=true Get Name ',' Speed ',' SystemName}
+		Invoke-Command -ComputerName $Server -ScriptBlock {Get-NetAdapter -Name Ethernet} | Select-Object @{name='Room'; expression={Get-RoomNumber -PCName $Server}},PSComputerName,LinkSpeed
 	}
 	Else{
 	}
 	$count += 1
 }
+
+$List | Where-Object LinkSpeed -EQ '100 Mbps' | Sort-Object -Property Room
