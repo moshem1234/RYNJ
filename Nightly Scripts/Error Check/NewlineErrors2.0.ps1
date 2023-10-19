@@ -5,7 +5,7 @@ ForEach ($Server in $PCs) {
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 		$Event4 = Get-WinEvent -ComputerName $Server -LogName "Microsoft-Windows-Kernel-PnP/Configuration" -FilterXPath "*[System[(Level=2)]]" -ErrorAction:SilentlyContinue | Select-Object TimeCreated, Message | Where-Object {($_.TimeCreated -GT $Yesterday) -and ($_.Message -Like "Device USB\VID_0000&PID_0002*")}
 		If($Event4){
-			# Restart-Computer -ComputerName $Server -Force
+			Restart-Computer -ComputerName $Server -Force
 			$Errors += "$Server "
 		}
 	}

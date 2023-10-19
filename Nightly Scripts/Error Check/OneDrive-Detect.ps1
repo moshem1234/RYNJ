@@ -15,11 +15,7 @@ ForEach ($Server in $PCs) {
 			Write-Output ===========================================================================================
 		}
 		Else {
-			If ($Winget -like "*Business*"){
-				Write-Output "Office 2016 Detected"
-				$Office2016 += "$Server "
-			}
-			ElseIf ($WinGet -like "*OneDriveSetup.exe*"){
+			If ($WinGet -like "*OneDriveSetup.exe*"){
 				Write-Output "OneDrive Found; Uninstalling"
 				Invoke-Command -ComputerName $Server -FilePath "\\PC1380\Scripts\OneDrive-Uninstall.ps1"
 				Write-Output "Uninstalled"
@@ -55,6 +51,6 @@ ForEach ($Server in $PCs) {
 
 	}
 }
-If($NULL -NE $Office2016 -or $NULL -NE $OneDrive -or $NULL -NE $Errors){
-	Send-MailMessage -From 'PC1380 <itnotifications@rynj.org>' -To 'Moshe <mmoskowitz@rynj.org>' -Credential $Credential -UseSSL -Subject 'OneDrive Script Report' -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "The following PCs still have Office 2016 Installed: $Office2016 `n `nThe following PCs had OneDrive found and uninstalled: $OneDrive `n`nThe following PCs encountered errors: $Errors" -WarningAction:SilentlyContinue
+If ($NULL -NE $OneDrive -or $NULL -NE $Errors){
+	Send-MailMessage -From 'PC1380 <itnotifications@rynj.org>' -To 'Moshe <mmoskowitz@rynj.org>' -Credential $Credential -UseSSL -Subject 'OneDrive Script Report' -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "The following PCs had OneDrive found and uninstalled: $OneDrive `n`nThe following PCs encountered errors: $Errors" -WarningAction:SilentlyContinue
 }
