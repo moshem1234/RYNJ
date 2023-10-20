@@ -31,25 +31,27 @@ If ($Command) {
 		$PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
 		Invoke
 	}
-	ElseIf ($Classrooms) {
-		$PCs = Get-Content -Path \\PC1380\Scripts\ClassroomPCs.txt
-		Invoke
-	}
-	ElseIf ($Offices) {
-		$PCs = Get-Content -Path \\PC1380\Scripts\OfficePCs.txt
-		Invoke
-	}
-	ElseIf ($CompLab) {
-		$PCs = Get-Content -Path \\PC1380\Scripts\CompLabPCs.txt
-		Invoke
-	}
-	ElseIf ($TLounge) {
-		$PCs = Get-Content -Path \\PC1380\Scripts\TLoungePCs.txt
-		Invoke
-	}
-	ElseIf($Array) {
-		$PCs = $Array
-		Invoke
+	ElseIf ($Classrooms -or $Offices -or $CompLab -or $TLounge -or $Array) {
+		If ($Classrooms) {
+			$PCs = Get-Content -Path \\PC1380\Scripts\ClassroomPCs.txt
+			Invoke
+		}
+		If ($Offices) {
+			$PCs = Get-Content -Path \\PC1380\Scripts\OfficePCs.txt
+			Invoke
+		}
+		If ($CompLab) {
+			$PCs = Get-Content -Path \\PC1380\Scripts\CompLabPCs.txt
+			Invoke
+		}
+		If ($TLounge) {
+			$PCs = Get-Content -Path \\PC1380\Scripts\TLoungePCs.txt
+			Invoke
+		}
+		If($Array) {
+			$PCs = $Array
+			Invoke
+		}
 	}
 	Else {
 		Write-Output "Please specify parameter from the following (-All -Classrooms -Offices -CompLab -TLounge -Array <string[]> -Offline)"
