@@ -15,7 +15,7 @@ Function Get-RoomNumber {
     }
 }
 
-$PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
+$PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt' | Where-Object {$_ -NE 'PC1039'}
 $List = ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Finding Speeds" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {

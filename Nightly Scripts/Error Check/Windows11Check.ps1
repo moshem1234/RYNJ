@@ -1,7 +1,7 @@
 $PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
 
 ForEach ($Server in $PCs) {
-	Write-Progress -Activity "Checking PCs" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
+	Write-Progress -Activity "Checking PCs (Windows 11)" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 		Invoke-Command -ComputerName $Server -ScriptBlock	{
 			$OS = (Get-WMIObject win32_operatingsystem).name
