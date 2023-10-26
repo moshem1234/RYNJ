@@ -3,7 +3,7 @@ Write-Host =====================================================================
 ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Detecting OneDrive" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
-		Get-ScheduledTask | Where-Object 'TaskName' -Like '*onedrive*' | Unregister-ScheduledTask -Confirm:$False
+		Invoke-Command -ComputerName $Server -ScriptBlock {Get-ScheduledTask | Where-Object 'TaskName' -Like '*onedrive*' | Unregister-ScheduledTask -Confirm:$False}
 		$WinGet = Invoke-Command -ComputerName $Server -ScriptBlock {winget list OneDrive --accept-source-agreements}
 		If ($WinGet -like "*No installed package found matching input criteria.*"){
 			# Write-Host "None Found"
