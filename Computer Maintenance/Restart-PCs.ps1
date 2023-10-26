@@ -18,7 +18,7 @@ Function Restart {
 		}
 	
 		Else {
-			Write-Output "$Server Not Connected"
+			Write-Host "$Server is Offline" -ForegroundColor Red
 		}
 	
 		$count += 1

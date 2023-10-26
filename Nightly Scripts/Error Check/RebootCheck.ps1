@@ -2,10 +2,10 @@ $PCs = Get-Content -Path '\\PC1380\Scripts\ClassroomPCs.txt'
 ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Checking Tasks" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
-		# Write-Output $Server
+		# Write-Host $Server
 		$Task = Invoke-Command -ComputerName $Server -ScriptBlock {Get-ScheduledTaskInfo 'Weekly Reboot' -ErrorAction:SilentlyContinue | Select-Object LastRunTime | Where-Object LastRunTime -NotLike '11/30/1999*'}
 		If ($NULL -NE $Task){
-			Write-Output "$Server not rebooted correctly. Restarting..."
+			Write-Host "$Server not rebooted correctly. Restarting..." -ForegroundColor Blue
 			Restart-Computer -ComputerName $Server -Force
 			$Errors += "$Server "
 		}

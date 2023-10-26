@@ -19,7 +19,7 @@ Function Invoke {
 		}
 		Else {
 			If ($Offline) {
-				Write-Output "$Server is Offline"
+				Write-Host "$Server is Offline" -ForegroundColor Red
 			}
 		}
 		$count += 1
