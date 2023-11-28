@@ -3,24 +3,6 @@ param (
     [switch]$Offline
 )
 
-$CSVData = Import-CSV -Path \\PC1380\Results\Locations.csv
-$PCRoomMapping = @{}
-ForEach ($Entry in $CSVData) {
-    $PCRoomMapping[$Entry."Name"] = $Entry."Room"
-}
-
-Function Get-RoomNumber {
-    param (
-        [string]$PCName
-    )
-    If ($PCRoomMapping.ContainsKey($PCName)) {
-        Return $PCRoomMapping[$PCName]
-    }
-	Else {
-        Return "PC Not Found."
-    }
-}
-
 $PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
 ForEach ($Server in $PCs) {
     Write-Progress -Activity "Testing Connection" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)

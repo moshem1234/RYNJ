@@ -1,6 +1,5 @@
 $PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
-# $Date = $Date = (Get-Date) - (New-TimeSpan -Day 1)
-$Date = Get-Date 10/18
+$Date = $Date = (Get-Date) - (New-TimeSpan -Day 1)
 ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Checking Logs" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {

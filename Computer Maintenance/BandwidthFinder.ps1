@@ -1,20 +1,3 @@
-$CSVData = Import-CSV -Path \\PC1380\Results\Locations.csv
-$PCRoomMapping = @{}
-ForEach ($Entry in $CSVData) {
-    $PCRoomMapping[$Entry."Name"] = $Entry."Room"
-}
-
-Function Get-RoomNumber {
-    param (
-        [string]$PCName
-    )
-    if ($PCRoomMapping.ContainsKey($PCName)) {
-        return $PCRoomMapping[$PCName]
-    } else {
-        return "PC not found."
-    }
-}
-
 $PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt' | Where-Object {$_ -NE 'PC1039'}
 $List = ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Finding Speeds" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)

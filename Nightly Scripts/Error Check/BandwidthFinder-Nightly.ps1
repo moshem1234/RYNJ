@@ -1,20 +1,3 @@
-$CSVData = Import-CSV -Path \\PC1380\Results\Locations.csv
-$PCRoomMapping = @{}
-ForEach ($Entry in $CSVData) {
-    $PCRoomMapping[$Entry."Name"] = $Entry."Room"
-}
-
-Function Get-RoomNumber {
-    param (
-        [string]$PCName
-    )
-    if ($PCRoomMapping.ContainsKey($PCName)) {
-        return $PCRoomMapping[$PCName]
-    } else {
-        return "PC not found."
-    }
-}
-
 Write-Output "" | Out-File \\PC1380\Results\BandwidthNightly.txt -Append
 Write-Output "=========================" | Out-File \\PC1380\Results\BandwidthNightly.txt -Append
 Get-Date -Format "MM/dd" | Out-File \\PC1380\Results\BandwidthNightly.txt -Append

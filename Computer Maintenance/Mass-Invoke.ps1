@@ -1,7 +1,7 @@
 param (
 	[string]$Command,
-    [switch]$All,
-    [switch]$Classrooms,
+	[switch]$All,
+	[switch]$Classrooms,
 	[switch]$Offices,
 	[switch]$CompLab,
 	[switch]$TLounge,

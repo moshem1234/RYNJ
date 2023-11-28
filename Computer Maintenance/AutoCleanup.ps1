@@ -13,4 +13,3 @@ $CacheDirItemNames |
 	}
 
 cleanmgr.exe /sagerun:7965
-cleanmgr.exe /sagerun:7965

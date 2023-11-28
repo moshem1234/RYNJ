@@ -1,20 +1,3 @@
-$CSVData = Import-CSV -Path \\PC1380\Results\Locations.csv
-$PCRoomMapping = @{}
-ForEach ($Entry in $CSVData) {
-    $PCRoomMapping[$entry."Name"] = $Entry."Room"
-}
-
-Function Get-RoomNumber {
-    param (
-        [string]$PCName
-    )
-    if ($PCRoomMapping.ContainsKey($PCName)) {
-        return $PCRoomMapping[$PCName]
-    } else {
-        return "PC not found."
-    }
-}
-
 Function Get-Webcams {
 	$PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
 	# Write-Output "Room,Webcam"
