@@ -55,7 +55,7 @@ If ($Profiles) {
 # SleepCount (100)
 
 Write-Host "Creating Cleanup/Scan/Repair Task (SFC,DISM,Restart)" -ForegroundColor Green
-Invoke-WUJob -ComputerName $Server -Script {sfc /scannow;Start-Sleep 100;DISM.exe /Online /Cleanup-Image /StartComponentCleanup;DISM.exe /Online /Cleanup-image /Restorehealth;Start-Sleep 100;Restart-Computer -Force} -Confirm:$False -RunNow -Force
+Invoke-WUJob -ComputerName $PCName -Script {sfc /scannow;Start-Sleep 100;DISM.exe /Online /Cleanup-Image /StartComponentCleanup;DISM.exe /Online /Cleanup-image /Restorehealth;Start-Sleep 100;Restart-Computer -Force} -Confirm:$False -RunNow -Force
 
 # Write-Host "SFC Scan" -ForegroundColor Green
 # Invoke-Command -ComputerName $PCName -ScriptBlock {sfc /scannow}
