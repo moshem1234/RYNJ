@@ -3,6 +3,7 @@ param (
 )
 
 Invoke-Command -ComputerName $PCName -ScriptBlock {
+	Update-Module PSWindowsUpdate
 	Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Force | Out-Null
 	Set-PSRepository -Name 'PSGallery' -InstallationPolicy Trusted
 	Install-Module PSWindowsUpdate
