@@ -1,4 +1,4 @@
-$PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt' | Where-Object {$_ -NE 'PC1039'}
+$PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
 $List = ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Finding Speeds" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
