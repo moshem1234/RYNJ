@@ -1,4 +1,4 @@
-$StartDate =  Get-Date -Date 9/22
+$StartDate = (Get-Date) - (New-TimeSpan -Day 1)
 $PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
 
 ForEach ($Server in $PCs) {
@@ -9,6 +9,6 @@ ForEach ($Server in $PCs) {
 	$count += 1
 }
 
-If ($NULL -ne $Var){
+If ($Var){
 	Send-MailMessage -From "Moshe's PC <itnotifications@rynj.org>" -To '<mmoskowitz@rynj.org>' -Subject "Redirection Errors Detected" -Credential $Credential -UseSSL -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "$Var" -WarningAction:SilentlyContinue
 }
