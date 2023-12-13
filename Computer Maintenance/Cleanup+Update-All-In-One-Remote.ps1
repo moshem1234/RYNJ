@@ -3,8 +3,8 @@ Function SleepCount($S){
     Do {
 		$M = [Math]::Floor($S / 60)
 		$MS = $S % 60
-		If ($PSVersionTable.PSVersion.Major -EQ 7) {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "$M Minutes, $MS Seconds Remaining: " -PercentComplete (($S/$S0) * 100) -Id 1}
-		Else {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "Time Remaining: " -PercentComplete (($S/$S0) * 100) -Id 1}
+		If ($PSVersionTable.PSVersion.Major -EQ 7) {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "$M Minutes, $MS Seconds Remaining: " -PercentComplete ((($S0-$S)/$S0) * 100) -Id 1}
+		Else {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "Time Remaining: " -PercentComplete ((($S0-$S)/$S0) * 100) -Id 1}
         $S--
         Start-Sleep -Seconds 1
     }
@@ -14,12 +14,15 @@ Function SleepCount($S){
 
 Write-Host "Waking Up Sleeping PCs" -ForegroundColor DarkBlue
 Wakeup
-Powershell {SleepCount (60)}
-# Start-Sleep -Seconds 60
+SleepCount (120)
 Clear-Host
 
-Write-Host "Running Windows Updates" -ForegroundColor DarkBlue
 $PCs = Get-Content -Path '\\PC1380\Results\Non-UpdatedPCs.txt'
+Write-Host "Restarting PCs" -ForegroundColor DarkBlue
+Restart-PCs -Array $PCs
+SleepCount (60)
+
+Write-Host "Running Windows Updates" -ForegroundColor DarkBlue
 ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Running Windows Updates" -Status $Server -PercentComplete (($Count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
