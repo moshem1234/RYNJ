@@ -1,6 +1,7 @@
 Get-ScheduledTask | Where-Object 'TaskName' -Like '*onedrive*' | Unregister-ScheduledTask -Confirm:$False
 
 If ((winget)){
+	Write-Progress -Activity "Uninstalling OneDrive" -Id 1
 	winget uninstall OneDriveSetup.exe --accept-source-agreements | Out-Null
 	winget uninstall Microsoft.OneDrive --accept-source-agreements | Out-Null
 	Remove-Item 'C:\Users\Default\AppData\Roaming\Microsoft\Windows\Start Menu\Programs\OneDrive.lnk' -ErrorAction:SilentlyContinue
@@ -25,7 +26,8 @@ If ((winget)){
 	}
 
 	# cmd -/c %systemroot%\SysWOW64\OneDriveSetup.exe /uninstall /allusers
-	Get-ChildItem C:\ -Recurse -Attributes Archive,Compressed,Device,Directory,Encrypted,Hidden,IntegrityStream,Normal,NoScrubData,NotContentIndexed,Offline,ReadOnly,ReparsePoint,SparseFile,System,Temporary | Where-Object {$_ -Like '*OneDrive*'} | Remove-Item -Recurse -Force -ErrorAction:SilentlyContinue
+	Get-ChildItem C:\ -Recurse -Attributes Archive,Compressed,Device,Directory,Encrypted,Hidden,IntegrityStream,Normal,NoScrubData,NotContentIndexed,Offline,ReadOnly,ReparsePoint,SparseFile,System,Temporary -ErrorAction SilentlyContinue | Where-Object {$_ -Like '*OneDrive*'} | Remove-Item -Recurse -Force -ErrorAction:SilentlyContinue
+	Write-Progress -Activity "Uninstalling OneDrive" -Completed -Id 1
 }
 Else {
 	$Name = hostname

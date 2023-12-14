@@ -4,11 +4,12 @@ ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Detecting OneDrive" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 		Invoke-Command -ComputerName $Server -ScriptBlock {Get-ScheduledTask | Where-Object 'TaskName' -Like '*onedrive*' | Unregister-ScheduledTask -Confirm:$False}
+		Start-Sleep -Seconds 2
 		$WinGet = Invoke-Command -ComputerName $Server -ScriptBlock {winget list OneDrive --accept-source-agreements}
 		If ($WinGet -like "*No installed package found matching input criteria.*"){
 			# Write-Host "None Found"
 		}
-		ElseIf ($NULL -eq $WinGet){
+		ElseIf (!$WinGet){
 		# 	Write-Host "Winget Needed"
 		# 	$NeedWinget += 1
 			Write-Host $Server
@@ -22,8 +23,9 @@ ForEach ($Server in $PCs) {
 				$OneDrive += "$Server "
 			}
 			Else {
-			Write-Host $WinGet -ForegroundColor Blue
-			$Errors += "$Server "
+				Write-Output $Server | Out-File -FilePath '\\PC1380\Results\OneDriveErrors.txt' -Append
+				Write-Output $WinGet | Tee-Object -FilePath '\\PC1380\Results\OneDriveErrors.txt' -Append
+				$Errors += "$Server "
 			}
 			Write-Host $Server
 			Write-Host ===========================================================================================
@@ -55,6 +57,6 @@ ForEach ($Server in $PCs) {
 	$count += 1
 	# Write-Host ===========================================================================================
 }
-If ($NULL -NE $OneDrive -or $NULL -NE $Errors){
+If ($OneDrive){
 	Send-MailMessage -From 'PC1380 <itnotifications@rynj.org>' -To 'Moshe <mmoskowitz@rynj.org>' -Credential $Credential -UseSSL -Subject 'OneDrive Script Report' -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "The following PCs had OneDrive found and uninstalled: $OneDrive `n`nThe following PCs encountered errors: $Errors" -WarningAction:SilentlyContinue
 }
