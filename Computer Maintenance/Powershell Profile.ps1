@@ -9,6 +9,7 @@ Set-Alias Q Quit
 Set-Alias C Clear-Host
 Set-Alias -Name IsItConnected -Value ConnectionTest
 Set-Alias Room Get-RoomNumber
+Set-Alias IC Invoke-Command
 Set-Alias M-I Mass-Invoke
 Set-Alias Hist Log
 Function New {
