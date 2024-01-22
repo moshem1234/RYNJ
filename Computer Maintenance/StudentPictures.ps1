@@ -1,4 +1,4 @@
-$CSVData = Import-CSV -Path \\PC1380\Results\IDMapping.csv
+$CSVData = Import-CSV -Path C:\Results\IDMapping.csv
 
 $IDEmailMapping = @{}
 ForEach ($Entry in $CSVData) {
@@ -28,12 +28,11 @@ ForEach ($File in $Files){
 	$Email = Get-Email $DDCID
 
 	If ($Email -ne "ID Not Found") {
-		gam user $Email update photo filename "A:\StudentPictures\Renamed\$File" | Out-File -FilePath C:\Results\GamStatus.log -Append
+		gam user $Email update photo filename "A:\StudentPictures\Renamed\$File" | Tee-Object -FilePath C:\Results\GamStatus.log -Append
 	}
 	Else {
-		Write-Output "No Email Found - $DDCID" | Out-File C:\Results\MissingIDs.log -Append
+		Write-Output "No Email Found - $DDCID" | Tee-Object C:\Results\MissingIDs.log -Append
 		# Write-Error "$DDCID - No Email Found"
 	}
 	$Count ++
 }
-
