@@ -4,6 +4,7 @@ ForEach ($Server in $PCs) {
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 		# Write-Output $Server
 		Invoke-Command -ComputerName $Server -ScriptBlock {
+			Update-Module PSWindowsUpdate -Force
 			$Update = Get-WindowsUpdate | Format-Table
 			If ($Update) {
 				HOSTNAME
