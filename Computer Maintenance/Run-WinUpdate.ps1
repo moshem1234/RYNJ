@@ -1,9 +1,9 @@
 $PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
 ForEach ($Server in $PCs) {
-	Write-Progress -Activity "Running Windows Updates" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
+	Write-Progress -Activity "Running Windows Updates" -Status $Server -PercentComplete (($Count / $PCs.Count) * 100)
 	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 		# Write-Output $Server
-		Invoke-Command -ComputerName $Server -ScriptBlock {Update-Module PSWindowsUpdate -Force}
+		Invoke-Command -ComputerName $Server -ScriptBlock {Update-Module PSWindowsUpdate}
 		$Update = Invoke-Command -ComputerName $Server -ScriptBlock {
 			Get-WindowsUpdate
 		}
@@ -14,5 +14,5 @@ ForEach ($Server in $PCs) {
 	}
 	Else{
 	}
-	$count += 1
+	$Count += 1
 }
