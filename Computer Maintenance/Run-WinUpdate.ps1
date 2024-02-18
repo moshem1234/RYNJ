@@ -1,3 +1,6 @@
+Param(
+	[Switch]$Show
+)
 $PCs = Get-Content -Path '\\PC1380\Scripts\AllPCs.txt'
 ForEach ($Server in $PCs) {
 	Write-Progress -Activity "Running Windows Updates" -Status $Server -PercentComplete (($Count / $PCs.Count) * 100)
@@ -10,6 +13,9 @@ ForEach ($Server in $PCs) {
 		If ($Update) {
 			Write-Host "Creating Windows Update Job on $Server" -ForegroundColor Magenta
 			Invoke-WUJob -ComputerName $Server -Script {Install-WindowsUpdate -AcceptAll -AutoReboot} -Confirm:$False -RunNow -Force
+			If ($Show) {
+				$Update
+			}
 		}
 	}
 	Else{
