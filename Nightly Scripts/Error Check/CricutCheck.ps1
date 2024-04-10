@@ -1,6 +1,7 @@
 Set-Location C:\Results\
 xidel -s "https://help.cricut.com/hc/en-us/sections/360002412713-Release-Notes" -e=$raw | Out-File ReleaseNotesNew.txt
-$Diff = Compare-Object (Get-Content ReleaseNotesOld.txt | Where-Object {$_ -NotLike '<script>*</script></body>'}) (Get-Content ReleaseNotesNew.txt | Where-Object {$_ -NotLike '<script>(function(){*();</script></body>'})
+# $Diff = Compare-Object (Get-Content ReleaseNotesOld.txt | Where-Object {($_ -NotLike '<script>*</script></body>') -and ($_ -NotLike '<meta name=*>') -and ($_ -NotLike '<script*</script>') -and ($_ -NotLike '  <!-- v* -->') -and ($_ -NotLike '  HelpCenter.internal*};')}) (Get-Content ReleaseNotesNew.txt | Where-Object {($_ -NotLike '<script>*</script></body>') -and ($_ -NotLike '<meta name=*>') -and ($_ -NotLike '<script*</script>') -and ($_ -NotLike '  <!-- v* -->') -and ($_ -NotLike '  HelpCenter.internal*};')})
+$Diff = Compare-Object (Get-Content ReleaseNotesOld.txt | Where-Object {$_-Like '*NEW-Release-Notes*'}) (Get-Content ReleaseNotesNew.txt | Where-Object {$_-Like '*NEW-Release-Notes*'})
 $Diff2 = $Diff | Out-String
 
 If ($Diff) {
