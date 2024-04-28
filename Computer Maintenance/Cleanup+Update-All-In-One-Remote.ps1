@@ -12,6 +12,8 @@ Function SleepCount($S){
     Write-Progress -Activity "Sleeping" -Completed -Id 1
 }
 
+$StartTime = Get-Date
+
 Write-Host "Waking Up Sleeping PCs" -ForegroundColor DarkBlue
 Wakeup
 SleepCount (120)
@@ -30,9 +32,18 @@ ForEach ($Server in $PCs) {
 		WindowsUpdate-Remote -PCName $Server
 	}
 	Else{
+		# Write-Host "Waking Up $Server" -ForegroundColor Red
+		Wakeup-PC -PC $Server
+		SleepCount (60)
+		If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
+			Write-Host $Server -BackgroundColor DarkMagenta
+			WindowsUpdate-Remote -PCName $Server
+		}
 	}
 	$Count += 1
 }
+
+$WinUpdatedPCs = $PCs.Count - (Get-Content -Path '\\PC1380\Results\Non-UpdatedPCs.txt').Count
 
 Write-Host "Running Dell Updates" -ForegroundColor DarkBlue
 $PCs = Get-Content -Path '\\PC1380\Results\Win-UpdatedPCs.txt'
@@ -43,9 +54,18 @@ ForEach ($Server in $PCs) {
 		Dell-Update-Remote -PCName $Server
 	}
 	Else{
+		# Write-Host "Waking Up $Server" -ForegroundColor Red
+		Wakeup-PC -PC $Server
+		SleepCount (60)
+		If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
+			Write-Host $Server -BackgroundColor DarkMagenta
+			Dell-Update-Remote -PCName $Server
+		}
 	}
 	$Count2 += 1
 }
+
+$DellUpdatedPCs = $PCs.Count - (Get-Content -Path '\\PC1380\Results\Win-UpdatedPCs.txt').Count
 
 Write-Host "Cleaning Up PCs" -ForegroundColor DarkBlue
 $PCs = Get-Content -Path '\\PC1380\Results\Dell-UpdatedPCs.txt'
@@ -56,6 +76,32 @@ ForEach ($Server in $PCs) {
 		Cleanup-Remote -PCName $Server -Auto -Profiles
 	}
 	Else{
+		# Write-Host "Waking Up $Server" -ForegroundColor Red
+		Wakeup-PC -PC $Server
+		SleepCount (60)
+		If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
+			Write-Host $Server -BackgroundColor DarkMagenta
+			Cleanup-Remote -PCName $Server -Auto -Profiles
+		}
 	}
 	$Count3 += 1
 }
+
+SleepCount (3600)
+
+Write-Host "Waking Up Sleeping PCs" -ForegroundColor DarkBlue
+Wakeup
+SleepCount (120)
+
+$PCs = Get-Content -Path '\\PC1380\Results\CleanedUpPCs.txt'
+Write-Host "Restarting PCs" -ForegroundColor DarkBlue
+Restart-PCs -Array $PCs
+
+$CleanedUpPCs = $PCs.Count - (Get-Content -Path '\\PC1380\Results\CleanedUpPCs.txt').Count
+
+$TimeTaken = (Get-Date) - $StartTime
+$TotalHours = $TimeTaken.TotalHours
+$HoursTaken = $TimeTaken.Hours
+$MinutesTaken = $TimeTaken.Minutes
+
+Send-MailMessage -From "Moshe's PC <itnotifications@rynj.org>" -To '<mmoskowitz@rynj.org>' -Subject "Mass Cleanup Completed in $HoursTaken Hours, $MinutesTaken Minutes" -Credential $Credential -UseSSL -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "$WinUpdatedPCs Windows Updates Completed`n`n$DellUpdatedPCs Dell Updates Completed`n`n$CleanedUpPCs PCs Cleaned Up`n`nScript Execution Completed in $TotalHours Hours" -WarningAction:SilentlyContinue
