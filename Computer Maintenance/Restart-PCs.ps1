@@ -52,6 +52,9 @@ ElseIf ($Classrooms -or $Offices -or $CompLab -or $TLounge -or $Array) {
 		Restart
 	}
 }
+ElseIf ($Help) {
+	"SYNTAX: Restart-PCs [-All] [-Classrooms] [-Offices] [-CompLab] [-TLounge] [-Array <string[]>]"
+}
 Else {
 	Write-Output "Please specify parameter from the following (-All -Classrooms -Offices -CompLab -TLounge -Array <string[]>)"
 }

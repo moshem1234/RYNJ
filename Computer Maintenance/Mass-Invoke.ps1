@@ -53,6 +53,9 @@ If ($Command) {
 			Invoke
 		}
 	}
+	ElseIf ($Help) {
+		"SYNTAX: Mass-Invoke [-Command] <string> [-All] [-Classrooms] [-Offices] [-CompLab] [-TLounge] [-Array <string[]>] [-Offline]"
+	}
 	Else {
 		Write-Output "Please specify parameter from the following (-All -Classrooms -Offices -CompLab -TLounge -Array <string[]> -Offline)"
 	}
