@@ -8,8 +8,8 @@ Function SleepCount($S){
 Do {
 	$M = [Math]::Floor($S / 60)
 	$MS = $S % 60
-	If ($PSVersionTable.PSVersion.Major -EQ 7) {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "$M Minutes, $MS Seconds Remaining: " -PercentComplete (($S/$S0) * 100) -Id 1}
-	Else {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "Time Remaining: " -PercentComplete (($S/$S0) * 100) -Id 1}
+	If ($PSVersionTable.PSVersion.Major -EQ 7) {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "$M Minutes, $MS Seconds Remaining: " -PercentComplete ((($S0-$S)/$S0) * 100) -Id 1}
+	Else {Write-Progress -SecondsRemaining $s -Activity "Sleeping" -Status "Time Remaining: " -PercentComplete ((($S0-$S)/$S0) * 100) -Id 1}
 	$S--
 	Start-Sleep -Seconds 1
 }
