@@ -1,5 +1,5 @@
 $PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
-Foreach ($Server in $PCs) {
+ForEach ($Server in $PCs) {
         
 	Write-Progress -Activity "Collecting Results" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
     
@@ -7,4 +7,4 @@ Foreach ($Server in $PCs) {
   
 	$count += 1
     
- }
+}
