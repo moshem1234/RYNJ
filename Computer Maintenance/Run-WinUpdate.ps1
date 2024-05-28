@@ -1,4 +1,4 @@
-$UpdatePCs = Detect-WinUpdate-v2 -ToRun
+$UpdatePCs = Detect-WinUpdate -ToRun
 
 Write-Progress -Activity "Running Windows Updates"
 ForEach ($Server in $UpdatePCs) {
