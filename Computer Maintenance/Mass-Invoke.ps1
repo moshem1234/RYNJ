@@ -1,5 +1,6 @@
 param (
-	[string]$Command,
+	[scriptblock]$Command,
+	[switch]$Individual,
 	[switch]$All,
 	[switch]$Classrooms,
 	[switch]$Offices,
@@ -11,6 +12,13 @@ param (
 )
 
 Function Invoke {
+	$PCs = ConnectionTest-v2 -InputPCs $PC_Input -Online -OutArray
+	Write-Progress -Activity "Mass Invoking"
+	Invoke-Command -ComputerName $PCs -ScriptBlock $Command
+	Write-Progress -Activity "Mass Invoking" -Completed
+}
+
+Function Invoke-v2 {
 	ForEach ($Server in $PCs) {
 		Write-Progress -Activity "Mass-Invoking" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
 		If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
@@ -28,33 +36,63 @@ Function Invoke {
 
 If ($Command) {
 	If ($All) {
-		$PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
-		Invoke
+		$PC_Input = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
+		If (-not $Individual) {
+			Invoke
+		}
+		Else {
+			Invoke-v2
+		}
 	}
 	ElseIf ($Classrooms -or $Offices -or $CompLab -or $TLounge -or $Array) {
 		If ($Classrooms) {
-			$PCs = Get-Content -Path \\PC1380\Scripts\ClassroomPCs.txt
-			Invoke
+			$PC_Input = Get-Content -Path \\PC1380\Scripts\ClassroomPCs.txt
+			If (-not $Individual) {
+				Invoke
+			}
+			Else {
+				Invoke-v2
+			}
 		}
 		If ($Offices) {
-			$PCs = Get-Content -Path \\PC1380\Scripts\OfficePCs.txt
-			Invoke
+			$PC_Input = Get-Content -Path \\PC1380\Scripts\OfficePCs.txt
+			If (-not $Individual) {
+				Invoke
+			}
+			Else {
+				Invoke-v2
+			}
 		}
 		If ($CompLab) {
-			$PCs = Get-Content -Path \\PC1380\Scripts\CompLabPCs.txt
-			Invoke
+			$PC_Input = Get-Content -Path \\PC1380\Scripts\CompLabPCs.txt
+			If (-not $Individual) {
+				Invoke
+			}
+			Else {
+				Invoke-v2
+			}
 		}
 		If ($TLounge) {
-			$PCs = Get-Content -Path \\PC1380\Scripts\TLoungePCs.txt
-			Invoke
+			$PC_Input = Get-Content -Path \\PC1380\Scripts\TLoungePCs.txt
+			If (-not $Individual) {
+				Invoke
+			}
+			Else {
+				Invoke-v2
+			}
 		}
 		If($Array) {
-			$PCs = $Array
-			Invoke
+			$PC_Input = $Array
+			If (-not $Individual) {
+				Invoke
+			}
+			Else {
+				Invoke-v2
+			}
 		}
 	}
 	ElseIf ($Help) {
-		"SYNTAX: Mass-Invoke [-Command] <string> [-All] [-Classrooms] [-Offices] [-CompLab] [-TLounge] [-Array <string[]>] [-Offline]"
+		"SYNTAX: Mass-Invoke [-Command]{ScriptBlock} [-Individual] [-All] [-Classrooms] [-Offices] [-CompLab] [-TLounge] [-Array <string[]>] [-Offline]"
 	}
 	Else {
 		Write-Output "Please specify parameter from the following (-All -Classrooms -Offices -CompLab -TLounge -Array <string[]> -Offline)"
