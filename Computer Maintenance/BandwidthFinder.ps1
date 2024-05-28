@@ -1,12 +1,5 @@
-$PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
-$List = ForEach ($Server in $PCs) {
-	Write-Progress -Activity "Finding Speeds" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
-	If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
-		Invoke-Command -ComputerName $Server -ScriptBlock {Get-NetAdapter -Name Ethernet} | Select-Object @{name='Room'; expression={Get-RoomNumber -PCName $Server}},PSComputerName,LinkSpeed
-	}
-	Else{
-	}
-	$count += 1
-}
-
+$PCs = ConnectionTest -Online -OutArray
+Write-Progress -Activity "Running Bandwidth Finder"
+$List = Invoke-Command -ComputerName $PCs -ScriptBlock {Get-NetAdapter -Name Ethernet} | Select-Object @{name='Room'; expression={Get-RoomNumber -PCName $_.PSComputerName}},PSComputerName,LinkSpeed
 $List | Where-Object LinkSpeed -EQ '100 Mbps' | Sort-Object -Property Room
+Write-Progress -Activity "Running Bandwidth Finder" -Completed
