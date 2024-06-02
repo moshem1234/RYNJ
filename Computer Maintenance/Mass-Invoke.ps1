@@ -12,15 +12,15 @@ param (
 )
 
 Function Invoke {
-	$PCs = ConnectionTest-v2 -InputPCs $PC_Input -Online -OutArray
+	$PCs = ConnectionTest -InputPCs $PC_Input -Online -OutArray
 	Write-Progress -Activity "Mass Invoking"
 	Invoke-Command -ComputerName $PCs -ScriptBlock $Command
 	Write-Progress -Activity "Mass Invoking" -Completed
 }
 
 Function Invoke-v2 {
-	ForEach ($Server in $PCs) {
-		Write-Progress -Activity "Mass-Invoking" -Status $Server -PercentComplete (($count / $PCs.Count) * 100)
+	ForEach ($Server in $PC_Input) {
+		Write-Progress -Activity "Mass-Invoking" -Status $Server -PercentComplete (($count / $PC_Input.Count) * 100)
 		If (Test-Connection -ComputerName $Server -Quiet -Count 1 -ErrorAction SilentlyContinue) {
 			$ScriptBlock = [scriptblock]::Create($Command)
 			Invoke-Command -ComputerName $Server -ScriptBlock $ScriptBlock
