@@ -1,4 +1,7 @@
 $PCs = ConnectionTest -Online -OutArray
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
+
 
 Write-Progress -Activity "Checking PCs (Windows 11)"
 	Invoke-Command -ComputerName $PCs -ScriptBlock	{

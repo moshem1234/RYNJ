@@ -1,3 +1,5 @@
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
 $PCs = ConnectionTest -Online -OutArray
 Write-Progress -Activity "Running Reboot Check"
 $Errors = Invoke-Command -ComputerName $PCs -ScriptBlock {

@@ -1,2 +1,4 @@
 ﻿$Event1 = Get-WinEvent -ComputerName PC1380 -LogName "System" -MaxEvents 1 -FilterXPath "*[System[Provider[@Name='User32']]]" | Select-Object TimeCreated, Message | Format-Table -AutoSize -Wrap | Out-String
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
 Send-MailMessage -From "Moshe's PC <itnotifications@rynj.org>" -To '<mmoskowitz@rynj.org>' -Subject "Moshe's PC has been Shut Down/Restarted" -Credential $Credential -UseSSL -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "$Event1" -WarningAction:SilentlyContinue

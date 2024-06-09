@@ -1,5 +1,6 @@
 $PCs = ConnectionTest -Online -OutArray
-
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
 Write-Progress -Activity "Querying Hard Drive Space"
 $Var = Invoke-Command -ComputerName $PCs -ScriptBlock {
 	wmic logicaldisk Get freespace ',' Caption /FORMAT:csv | Out-File 'C:\Windows\temp\disk.csv'

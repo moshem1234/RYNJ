@@ -1,3 +1,5 @@
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
 $Yesterday = (Get-Date) - (New-TimeSpan -Day 1)
 $PCs = Get-Content -Path \\PC1380\Scripts\ClassroomPCs.txt
 ForEach ($Server in $PCs) {
@@ -16,5 +18,5 @@ If($NULL -NE $Errors){
 Restarted PCs include: $Errors" -WarningAction:SilentlyContinue
 }
 Else{
-	Send-MailMessage -From 'PC1380 <itnotifications@rynj.org>' -To 'IT <IT@rynj.org>' -Credential $Credential -UseSSL -Subject 'No Newline Board Errors' -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "The script has ran succesfully and there were no Newline errors found." -WarningAction:SilentlyContinue
+	# Send-MailMessage -From 'PC1380 <itnotifications@rynj.org>' -To 'IT <IT@rynj.org>' -Credential $Credential -UseSSL -Subject 'No Newline Board Errors' -SmtpServer 'smtp-relay.gmail.com' -Port 25 -body "The script has ran succesfully and there were no Newline errors found." -WarningAction:SilentlyContinue
 }

@@ -1,3 +1,6 @@
+$Key = Get-Content \\PC1380\Scripts\AES.key
+$Credential = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList "itnotifications@rynj.org", (Get-Content \\PC1380\Scripts\ITnotificationsPW.txt | ConvertTo-SecureString -Key $Key)
+
 $Date = (Get-Date) - (New-TimeSpan -Days 1)
 $PCs = Get-Content -Path \\PC1380\Scripts\AllPCs.txt
 ForEach ($Server in $PCs) {
